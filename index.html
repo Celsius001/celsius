@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celsius-001</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .card {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 420px;
+            border: 1px solid #222222;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.02);
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            text-align: center;
+        }
+
+        .card.active {
+            display: flex;
+            animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
+        p { margin: 0; color: #a0a0a0; font-size: 16px; line-height: 1.6; }
+
+        .btn {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            width: 100%;
+        }
+        .btn:hover { background-color: #e0e0e0; }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-outline {
+            background-color: transparent;
+            color: #ffffff;
+            border: 2px solid #333333;
+        }
+        .btn-outline:hover { background-color: #111111; border-color: #ffffff; }
+
+        input {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid #333333;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: #ffffff; }
+        input::placeholder { color: #666666; }
+
+        .tos-box {
+            height: 160px;
+            overflow-y: auto;
+            text-align: left;
+            background: #0a0a0a;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #222222;
+            font-size: 14px;
+            color: #bbbbbb;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card active" id="card-intro">
+        <h1>Celsius-001</h1>
+        <p>The modern, ultra-fast web proxy built for unrestricted browsing. Experience the web the way it was meant to be—open and fluid.</p>
+        <button class="btn" onclick="nextCard('card-intro', 'card-tos')">Get Started</button>
+    </div>
+
+    <div class="card" id="card-tos">
+        <h1>Terms of Service</h1>
+        <div class="tos-box">
+            <strong>1. Usage</strong><br>
+            By using Celsius-001, you agree to use this service responsibly. We are not responsible for any network violations that occur from using this unblocker.<br><br>
+            <strong>2. Privacy</strong><br>
+            We respect your privacy. Your traffic is routed securely, but we highly recommend avoiding logging into sensitive accounts (like banking) while using proxy connections.<br><br>
+            <strong>3. Abuse</strong><br>
+            Any abuse of our servers (DDoS, spamming, etc.) will result in an immediate hardware ban.
+        </div>
+        <p style="font-size: 14px;">Please review the rules before continuing.</p>
+        <button class="btn" onclick="nextCard('card-tos', 'card-signup')">I Agree, Next</button>
+    </div>
+
+    <div class="card" id="card-signup">
+        <h1>Join Celsius-001</h1>
+        <p>Create an account to save your tabs, history, and custom proxy settings.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="btn btn-outline" id="google-signin">Continue with Google</button>
+            <div style="color: #666; font-size: 14px; margin: 8px 0;">— or —</div>
+            <input type="email" id="email" placeholder="Email address">
+            <input type="password" id="password" placeholder="Password">
+            <button class="btn" id="email-signin">Sign Up / Log In</button>
+        </div>
+    </div>
+
+    <script>
+        function nextCard(currentId, nextId) {
+            document.getElementById(currentId).classList.remove('active');
+            setTimeout(() => {
+                document.getElementById(nextId).classList.add('active');
+            }, 150);
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDj46RSodJ56rWwsxp9wh2x44hcZtBImxw",
+            authDomain: "celsius-001.firebaseapp.com",
+            projectId: "celsius-001",
+            storageBucket: "celsius-001.firebasestorage.app",
+            messagingSenderId: "80703174723",
+            appId: "1:80703174723:web:10c8e93d0d544ffc967cf6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        document.getElementById('google-signin').addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    window.location.href = "home/index.html";
+                }).catch((error) => {
+                    alert("Error: " + error.message);
+                });
+        });
+
+        document.getElementById('email-signin').addEventListener('click', () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if(!email || !password) {
+                alert("Please enter both email and password.");
+                return;
+            }
+
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    window.location.href = "home/index.html";
+                })
+                .catch((error) => {
+                    if(error.code === 'auth/email-already-in-use') {
+                        signInWithEmailAndPassword(auth, email, password)
+                            .then((userCredential) => {
+                                window.location.href = "home/index.html";
+                            })
+                            .catch((err) => alert("Login Error: " + err.message));
+                    } else {
+                        alert("Error: " + error.message);
+                    }
+                });
+        });
+    </script>
+
+</body>
+</html>
