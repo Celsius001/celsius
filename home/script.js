@@ -7,35 +7,36 @@ const urlInput = document.querySelector('.url-input');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
 const reloadBtn = document.getElementById('reloadBtn');
 
+function getIconSrc(url) {
+    const appName = url.replace('celsius://', '');
+    return appName === 'home' ? '../favicon.ico' : `../${appName}/favicon.ico`;
+}
+
 function createTab(title = 'New Tab', url = 'celsius://home') {
     const tab = document.createElement('div');
     tab.className = 'tab';
     
-    // Every tab gets a close button now!
     const closeBtnHTML = `
         <button class="close-tab">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>`;
     
     tab.innerHTML = `
-        <img src="../favicon.png" alt="" class="tab-icon">
+        <img src="${getIconSrc(url)}" alt="" class="tab-icon">
         <span class="tab-title">${title}</span>
         ${closeBtnHTML}
     `;
 
     tab.dataset.url = url;
 
-    // Switch to this tab if clicking anywhere except the close button
     tab.addEventListener('click', (e) => {
         if (!e.target.closest('.close-tab')) {
             activateTab(tab);
         }
     });
 
-    // Handle closing the tab
     const closeBtn = tab.querySelector('.close-tab');
     closeBtn.addEventListener('click', () => {
-        // Animate out
         tab.style.animation = 'none';
         tab.style.opacity = '0';
         tab.style.width = '0';
@@ -48,12 +49,9 @@ function createTab(title = 'New Tab', url = 'celsius://home') {
             tab.remove();
             
             const remainingTabs = document.querySelectorAll('.tab');
-            // If we closed the active tab, switch to the last remaining one
             if (remainingTabs.length > 0 && wasActive) {
                 activateTab(remainingTabs[remainingTabs.length - 1]);
-            } 
-            // If we closed the very last tab, show the home view
-            else if (remainingTabs.length === 0) {
+            } else if (remainingTabs.length === 0) {
                 appFrame.style.display = 'none';
                 homeView.style.display = 'flex';
                 urlInput.value = '';
@@ -110,15 +108,17 @@ sidebarLinks.forEach(link => {
         const appUrl = link.dataset.app;
         const titleText = link.href.split('/').slice(-2)[0] || 'Home';
         const formattedTitle = titleText.charAt(0).toUpperCase() + titleText.slice(1);
+        const finalTitle = formattedTitle === 'Home' ? 'Celsius Home' : formattedTitle;
         
         const activeTab = document.querySelector('.tab.active');
         
         if (activeTab) {
-            activeTab.querySelector('.tab-title').textContent = formattedTitle === 'Home' ? 'Celsius Home' : formattedTitle;
+            activeTab.querySelector('.tab-title').textContent = finalTitle;
+            activeTab.querySelector('.tab-icon').src = getIconSrc(appUrl);
             activeTab.dataset.url = appUrl;
             updateContent(appUrl);
         } else {
-            createTab(formattedTitle === 'Home' ? 'Celsius Home' : formattedTitle, appUrl);
+            createTab(finalTitle, appUrl);
         }
     });
 });
