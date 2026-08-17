@@ -3,11 +3,12 @@ const newTabBtn = document.getElementById('newTabBtn');
 const sidebarLinks = document.querySelectorAll('.sidebar-link');
 const appFrame = document.getElementById('appFrame');
 const homeView = document.getElementById('homeView');
-const urlInput = document.querySelector('.url-input');
+const urlInput = document.getElementById('urlInput');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
 const reloadBtn = document.getElementById('reloadBtn');
 
 function getIconSrc(url) {
+    if (!url.startsWith('celsius://')) return '../favicon.ico';
     const appName = url.replace('celsius://', '');
     return appName === 'home' ? '../favicon.ico' : `../${appName}/favicon.ico`;
 }
@@ -88,14 +89,38 @@ function updateContent(appUrl) {
         appFrame.style.display = 'none';
         homeView.style.display = 'flex';
         appFrame.src = 'about:blank';
-    } else {
+    } else if (appUrl.startsWith('celsius://')) {
         homeView.style.display = 'none';
         appFrame.style.display = 'block';
         
         const htmlFile = '../' + appUrl.replace('celsius://', '') + '/index.html';
         appFrame.src = htmlFile;
+    } else {
+        homeView.style.display = 'none';
+        appFrame.style.display = 'block';
+        appFrame.src = appUrl;
     }
 }
+
+urlInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        let newUrl = urlInput.value.trim();
+        
+        if (!newUrl.startsWith('celsius://') && !newUrl.startsWith('http')) {
+            newUrl = 'https://' + newUrl;
+        }
+        
+        const activeTab = document.querySelector('.tab.active');
+        if (activeTab) {
+            activeTab.dataset.url = newUrl;
+            activeTab.querySelector('.tab-title').textContent = newUrl;
+            activeTab.querySelector('.tab-icon').src = getIconSrc(newUrl);
+            updateContent(newUrl);
+        } else {
+            createTab(newUrl, newUrl);
+        }
+    }
+});
 
 newTabBtn.addEventListener('click', () => {
     createTab('Celsius Home', 'celsius://home');
