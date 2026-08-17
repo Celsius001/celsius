@@ -1,3 +1,8 @@
+@font-face {
+    font-family: 'Drason';
+    src: url('drason.ttf') format('truetype');
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -114,27 +119,8 @@ body {
     background-color: #050505;
     display: flex;
     align-items: center;
-    padding: 0 8px;
+    padding: 0 8px 0 0; 
     gap: 8px;
-}
-
-.accounts-top-btn {
-    background: none;
-    border: 1px solid #222;
-    color: #888888;
-    width: 36px;
-    height: 28px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.accounts-top-btn:hover {
-    background-color: #1a1a1a;
-    color: #ffffff;
 }
 
 .tabs-list {
@@ -332,7 +318,8 @@ body {
 }
 
 .logo-text {
-    font-family: 'Chewy', system-ui;
+    font-family: 'Drason', system-ui, sans-serif;
+    font-style: italic;
     font-size: 110px;
     letter-spacing: 2px;
     color: #ffffff;
