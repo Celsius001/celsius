@@ -123,6 +123,7 @@
         <div style="display: flex; flex-direction: column; gap: 12px;">
             <button class="btn btn-outline" id="google-signin">Continue with Google</button>
             <div style="color: #666; font-size: 14px; margin: 8px 0;">— or —</div>
+            <input type="text" id="username" placeholder="Username (for new accounts)">
             <input type="email" id="email" placeholder="Email address">
             <input type="password" id="password" placeholder="Password">
             <button class="btn" id="email-signin">Sign Up / Log In</button>
@@ -140,7 +141,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+        import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } 
         from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -166,6 +167,7 @@
         });
 
         document.getElementById('email-signin').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
@@ -176,7 +178,18 @@
 
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
-                    window.location.href = "home/index.html";
+                    if (username) {
+                        updateProfile(userCredential.user, {
+                            displayName: username
+                        }).then(() => {
+                            window.location.href = "home/index.html";
+                        }).catch((error) => {
+                            console.error("Error updating profile:", error);
+                            window.location.href = "home/index.html";
+                        });
+                    } else {
+                        window.location.href = "home/index.html";
+                    }
                 })
                 .catch((error) => {
                     if(error.code === 'auth/email-already-in-use') {
