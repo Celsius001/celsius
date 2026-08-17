@@ -8,9 +8,10 @@ const fullscreenBtn = document.getElementById('fullscreenBtn');
 const reloadBtn = document.getElementById('reloadBtn');
 
 function getIconSrc(url) {
-    if (!url.startsWith('celsius://')) return './favicon.ico';
-    const appName = url.replace('celsius://', '');
-    return appName === 'home' ? './favicon.ico' : `./${appName}/favicon.ico`;
+    if (!url.startsWith('celsius://')) return '../favicon.ico';
+    let appName = url.replace('celsius://', '');
+    if (appName === 'ai') appName = 'clanker';
+    return appName === 'home' ? '../favicon.ico' : `../${appName}/favicon.ico`;
 }
 
 function createTab(title = 'New Tab', url = 'celsius://home') {
@@ -57,7 +58,8 @@ function createTab(title = 'New Tab', url = 'celsius://home') {
                 homeView.style.display = 'flex';
                 urlInput.value = '';
                 sidebarLinks.forEach(l => l.classList.remove('active'));
-                document.querySelector('[data-app="celsius://home"]').classList.add('active');
+                const homeLink = document.querySelector('[data-app="celsius://home"]');
+                if (homeLink) homeLink.classList.add('active');
             }
         }, 200);
     });
@@ -80,7 +82,7 @@ function updateContent(appUrl) {
     
     sidebarLinks.forEach(link => {
         link.classList.remove('active');
-        if(link.dataset.app === appUrl) {
+        if (link.dataset.app === appUrl) {
             link.classList.add('active');
         }
     });
@@ -93,7 +95,12 @@ function updateContent(appUrl) {
         homeView.style.display = 'none';
         appFrame.style.display = 'block';
         
-        const htmlFile = './' + appUrl.replace('celsius://', '') + '/index.html';
+        let folderName = appUrl.replace('celsius://', '');
+        if (folderName === 'ai') {
+            folderName = 'clanker';
+        }
+        
+        const htmlFile = '../' + folderName + '/index.html';
         appFrame.src = htmlFile;
     } else {
         homeView.style.display = 'none';
@@ -131,9 +138,10 @@ sidebarLinks.forEach(link => {
         e.preventDefault();
         
         const appUrl = link.dataset.app;
-        const titleText = link.href.split('/').slice(-2)[0] || 'Home';
-        const formattedTitle = titleText.charAt(0).toUpperCase() + titleText.slice(1);
-        const finalTitle = formattedTitle === 'Home' ? 'Celsius Home' : formattedTitle;
+        let appName = appUrl.replace('celsius://', '');
+        
+        const formattedTitle = appName.charAt(0).toUpperCase() + appName.slice(1);
+        const finalTitle = appName === 'home' ? 'Celsius Home' : formattedTitle;
         
         const activeTab = document.querySelector('.tab.active');
         
