@@ -8,9 +8,9 @@ const fullscreenBtn = document.getElementById('fullscreenBtn');
 const reloadBtn = document.getElementById('reloadBtn');
 
 function getIconSrc(url) {
-    if (!url.startsWith('celsius://')) return '../favicon.ico';
+    if (!url.startsWith('celsius://')) return './favicon.ico';
     const appName = url.replace('celsius://', '');
-    return appName === 'home' ? '../favicon.ico' : `../${appName}/favicon.ico`;
+    return appName === 'home' ? './favicon.ico' : `./${appName}/favicon.ico`;
 }
 
 function createTab(title = 'New Tab', url = 'celsius://home') {
@@ -93,7 +93,7 @@ function updateContent(appUrl) {
         homeView.style.display = 'none';
         appFrame.style.display = 'block';
         
-        const htmlFile = '../' + appUrl.replace('celsius://', '') + '/index.html';
+        const htmlFile = './' + appUrl.replace('celsius://', '') + '/index.html';
         appFrame.src = htmlFile;
     } else {
         homeView.style.display = 'none';
