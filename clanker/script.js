@@ -197,46 +197,23 @@ async function sendMessage(text) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: 'deepseek-v4-flash',
                 prompt: text,
-                userId: currentUser.uid,
-                stream: true
+                userId: currentUser.uid
             })
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const errData = await response.json();
-            aiMessageDiv.textContent = errData.error || "An error occurred.";
+            aiMessageDiv.textContent = data.error || "An error occurred.";
             sendBtn.disabled = false;
             userInput.disabled = false;
             return;
         }
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buf = "";
-        let fullAiText = "";
-
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-
-            buf += decoder.decode(value, { stream: true });
-            const lines = buf.split('\n');
-            buf = lines.pop();
-
-            for (const line of lines) {
-                if (!line.startsWith('data:') || line.includes('[DONE]')) continue;
-                try {
-                    const evt = JSON.parse(line.slice(5));
-                    if (evt.type === 'delta' && evt.text) {
-                        fullAiText += evt.text;
-                        aiMessageDiv.textContent = fullAiText;
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                    }
-                } catch (e) {}
-            }
-        }
+        const fullAiText = data.reply;
+        aiMessageDiv.textContent = fullAiText;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
         await addDoc(messagesRef, {
             text: fullAiText,
