@@ -190,7 +190,11 @@ async function sendMessage(text) {
         createdAt: serverTimestamp()
     });
 
-    const aiMessageDiv = appendMessageUI('...', 'ai');
+    const aiMessageDocRef = await addDoc(messagesRef, {
+        text: '...',
+        sender: 'ai',
+        createdAt: serverTimestamp()
+    });
 
     try {
         const response = await fetch(BACKEND_URL, {
@@ -205,30 +209,25 @@ async function sendMessage(text) {
         const data = await response.json();
 
         if (!response.ok) {
-            aiMessageDiv.textContent = data.error || "An error occurred.";
+            await updateDoc(aiMessageDocRef, { text: data.error || "An error occurred with the AI API." });
             sendBtn.disabled = false;
             userInput.disabled = false;
             return;
         }
 
-        const fullAiText = data.reply;
-        aiMessageDiv.textContent = fullAiText;
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-        await addDoc(messagesRef, {
-            text: fullAiText,
-            sender: 'ai',
-            createdAt: serverTimestamp()
-        });
-
+        const fullAiText = data.reply || "No response generated.";
+        
+        await updateDoc(aiMessageDocRef, { text: fullAiText });
         updateUsageCounter();
 
     } catch (err) {
-        aiMessageDiv.textContent = "Failed to communicate with the server.";
+        console.error(err);
+        await updateDoc(aiMessageDocRef, { text: "Failed to communicate with the backend server. Make sure your Vercel deployment is live." });
     } finally {
         sendBtn.disabled = false;
         userInput.disabled = false;
         userInput.focus();
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 }
 
